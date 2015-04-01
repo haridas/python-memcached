@@ -56,6 +56,7 @@ import sys
 import threading
 import time
 import zlib
+import bisect
 
 import six
 
@@ -1505,7 +1506,8 @@ class KetamaClient(Client):
         # map the key on to the ring slot space.
         h_key = self._generate_ring_slot(key)
 
-        for slot in self._ketama_server_slots:
+        slot = bisect.bisect_left(self._ketama_server_slots, key)
+        if slot < len(self._ketama_server_slots):
             if h_key <= slot:
                 server = self._ketama_server_ring[slot]
                 if server.connect():
